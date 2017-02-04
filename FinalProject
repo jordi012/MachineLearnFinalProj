@@ -13,7 +13,6 @@ training <- read.csv("C:/Users/Jordi/Desktop/pml-training.csv", na.strings=c("NA
 testing <- read.csv("C:/Users/Jordi/Desktop/pml-testing.csv", na.strings=c("NA","#DIV/0!",""))
 inTrain <- createDataPartition(y=training$classe, p=0.6, list=FALSE)
 
-inTrain <- createDataPartition(y=training$classe, p=0.6, list=FALSE)
 training2 <- training[inTrain, ]; testing2 <- training[-inTrain, ]
 dim(training2); dim(testing2)
 ## [1] 11776   160
@@ -21,6 +20,7 @@ dim(training2); dim(testing2)
 
 ## Exclude the values with variance near to 0. To clean the model.
 myDataNZV <- nearZeroVar(training2, saveMetrics=TRUE)
+myNZVvars <- names(training2)
 
 myNZVvars <- names(training2) %in% c("new_window", "kurtosis_roll_belt", "kurtosis_picth_belt",
 "kurtosis_yaw_belt", "skewness_roll_belt", "skewness_roll_belt.1", "skewness_yaw_belt",
@@ -48,6 +48,7 @@ training2 <- training2[c(-1)]
 
 ## we exclude NA values if they exceed or equal 60% of the observations.
 trainingV3 <- training2 #creating another subset to iterate in loop
+
 for(i in 1:length(training2)) { #for every column in the training dataset
         if( sum( is.na( training2[, i] ) ) /nrow(training2) >= .6 ) { #if n?? NAs > 60% of total observations
         for(j in 1:length(trainingV3)) {
@@ -100,7 +101,7 @@ modFitB1 <- randomForest(classe ~. , data=training2)
 predictionsB1 <- predict(modFitB1, testing2, type = "class")
 confusionMatrix(predictionsB1, testing2$classe)
 
-## We finally pick up the random forest model bcs the accuracy of this model (0.998) is higher than the decision tree (0.863)
+## We finally pick up the random forest model bcs the accuracy of this model (0.998) is higher than the decision tree (0.874)
 confusionMatrix(predictionsA1, testing2$classe)
 
 ## We apply the results to the testing dataset
